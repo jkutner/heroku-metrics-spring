@@ -1,3 +1,4 @@
 target
 .idea
 *.iml
+.bash_history
