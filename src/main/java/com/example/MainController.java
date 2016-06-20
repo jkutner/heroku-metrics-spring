@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -40,26 +41,20 @@ public class MainController implements BeanFactoryAware {
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) throws IOException {
-    System.out.println("LOG: " + body);
+    // "application/logplex-1" does not conform to RFC5424. It leaves out STRUCTURED-DATA but does not replace it with
+    // a NILVALUE. To workaround this, we inject empty STRUCTURED-DATA.
+    String[] parts = body.split("router - ");
+    String log = parts[0] + "router - [] " + parts[1];
+
     RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
-
-    Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(body.getBytes()));
-//    for (String key : messages.keySet()) {
-//      Object o = messages.get(key);
-//      if (o != null)
-//        System.out.println(key + ": <" + o.getClass() + "> " + o.toString());
-//      else
-//        System.out.println(key + ": null");
-//    }
-
-
+    Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(log.getBytes()));
     ObjectMapper mapper = new ObjectMapper();
 
     MessageChannel toKafka = context.getBean("toKafka", MessageChannel.class);
-
     String json = mapper.writeValueAsString(messages);
-
     toKafka.send(new GenericMessage<>(json));
+
+    System.out.println(json);
 
     return "ok";
   }

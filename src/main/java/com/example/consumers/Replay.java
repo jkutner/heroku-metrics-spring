@@ -1,10 +1,17 @@
 package com.example.consumers;
 
 import com.example.KafkaConfig;
+import com.example.Route;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -22,6 +29,10 @@ public class Replay {
   private final AtomicBoolean running = new AtomicBoolean();
 
   private CountDownLatch stopLatch;
+
+  private ObjectMapper mapper = new ObjectMapper();
+
+  private TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String>>() {};
 
   public static void main(String[] args) {
     Replay replay = new Replay();
@@ -64,17 +75,28 @@ public class Replay {
     do {
       ConsumerRecords<String, String> records = consumer.poll(100);
       for (ConsumerRecord<String, String> record : records) {
-        if (null == System.getenv("REPLAY_HOST")) {
-          System.out.println("Simulating request: " + record.value());
-        } else {
-          // TODO
+        try {
+          String path = parseRoute(record);
+          if (null == System.getenv("REPLAY_HOST")) {
+            System.out.println("Simulating request: " + path);
+          } else {
+            // TODO
+          }
+        } catch (IOException e) {
+          System.out.println("Skipping route: " + record.value());
+          e.printStackTrace();
         }
-
       }
     } while (running.get());
 
     System.out.println("closing consumer...");
     consumer.close();
     stopLatch.countDown();
+  }
+
+  private String parseRoute(ConsumerRecord<String, String> record) throws IOException {
+    Map<String,String> recordMap = mapper.readValue(record.value(), typeRef);
+    Route route = new Route(recordMap);
+    return route.get("path");
   }
 }
