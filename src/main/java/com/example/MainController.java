@@ -35,6 +35,7 @@ public class MainController {
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) {
+    System.out.println(body);
     RFC5424SyslogParser parser = new RFC5424SyslogParser();
 
     Map<String, ?> messages = parser.parse(body, 0, false);
