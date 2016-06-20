@@ -32,13 +32,14 @@ public class MainController {
         this.helloWorldService.getHelloMessage());
   }
 
+
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) {
-    System.out.println(body);
+    //System.out.println(body.substring(4, body.length()));
     RFC5424SyslogParser parser = new RFC5424SyslogParser();
 
-    Map<String, ?> messages = parser.parse(body, 0, false);
+    Map<String, ?> messages = parser.parse(body.substring(4, body.length()), 0, false);
 
     for (String key : messages.keySet()) {
       System.out.println(key + ": " + messages.get(key));
