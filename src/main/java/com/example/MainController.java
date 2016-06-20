@@ -37,7 +37,7 @@ public class MainController {
   public String logs(@RequestBody String body) {
     RFC5424SyslogParser parser = new RFC5424SyslogParser();
 
-    Map<String, ?> messages = parser.parse(body, 1, true);
+    Map<String, ?> messages = parser.parse(body, 0, false);
 
     for (String key : messages.keySet()) {
       System.out.println(key + ": " + messages.get(key));
