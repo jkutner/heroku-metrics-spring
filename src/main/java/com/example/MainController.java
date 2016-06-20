@@ -1,5 +1,8 @@
 package com.example;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -9,6 +12,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
+import org.springframework.integration.syslog.inbound.RFC6587SyslogDeserializer;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,11 +39,14 @@ public class MainController {
 
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
-  public String logs(@RequestBody String body) {
-    RFC5424SyslogParser parser = new RFC5424SyslogParser();
+  public String logs(@RequestBody String body) throws IOException {
+    //RFC5424SyslogParser parser = new RFC5424SyslogParser();
+    //int firstSpace = body.indexOf(" ");
+    //Map<String, ?> messages = parser.parse(body.substring(firstSpace, body.length()), 0, false);
 
-    int firstSpace = body.indexOf(" ");
-    Map<String, ?> messages = parser.parse(body.substring(firstSpace, body.length()), 0, false);
+    RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
+
+    Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(body.getBytes()));
 
     for (String key : messages.keySet()) {
       System.out.println(key + ": " + messages.get(key));
