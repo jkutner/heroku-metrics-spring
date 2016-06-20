@@ -25,9 +25,6 @@ public class MainController implements BeanFactoryAware {
 
   private BeanFactory context;
 
-  @Autowired
-  private HelloWorldService helloWorldService;
-
   @Override
   public void setBeanFactory(BeanFactory factory) {
     this.context = factory;
@@ -35,9 +32,8 @@ public class MainController implements BeanFactoryAware {
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
   @ResponseBody
-  public Map<String, String> hello() {
-    return Collections.singletonMap("message",
-        this.helloWorldService.getHelloMessage());
+  public String hello() {
+    return "Hello from Spring!";
   }
 
 
@@ -53,7 +49,7 @@ public class MainController implements BeanFactoryAware {
     MessageChannel toKafka = context.getBean("toKafka", MessageChannel.class);
 
     String json = mapper.writeValueAsString(messages);
-    System.out.println("Sending message: " + json);
+
     toKafka.send(new GenericMessage<>(json));
 
     return "ok";

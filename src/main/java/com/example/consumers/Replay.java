@@ -64,7 +64,12 @@ public class Replay {
     do {
       ConsumerRecords<String, String> records = consumer.poll(100);
       for (ConsumerRecord<String, String> record : records) {
-        System.out.println("Got message: " + record.value());
+        if (null != System.getenv("REPLAY_HOST")) {
+          System.out.println("Simulating request: " + record.value());
+        } else {
+
+        }
+
       }
     } while (running.get());
 
