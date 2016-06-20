@@ -32,7 +32,7 @@ public class Replay {
 
   private ObjectMapper mapper = new ObjectMapper();
 
-  private TypeReference<HashMap<String,String>> typeRef = new TypeReference<HashMap<String,String>>() {};
+  private TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
 
   public static void main(String[] args) {
     Replay replay = new Replay();

@@ -56,8 +56,6 @@ public class MainController implements BeanFactoryAware {
     String json = mapper.writeValueAsString(messages);
     toKafka.send(new GenericMessage<>(json));
 
-    System.out.println(json);
-
     return "ok";
   }
 
