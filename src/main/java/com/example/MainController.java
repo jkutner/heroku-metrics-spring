@@ -40,16 +40,17 @@ public class MainController implements BeanFactoryAware {
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) throws IOException {
+    System.out.println("LOG: " + body);
     RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
 
     Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(body.getBytes()));
-    for (String key : messages.keySet()) {
-      Object o = messages.get(key);
-      if (o != null)
-        System.out.println(key + ": <" + o.getClass() + "> " + o.toString());
-      else
-        System.out.println(key + ": null");
-    }
+//    for (String key : messages.keySet()) {
+//      Object o = messages.get(key);
+//      if (o != null)
+//        System.out.println(key + ": <" + o.getClass() + "> " + o.toString());
+//      else
+//        System.out.println(key + ": null");
+//    }
 
 
     ObjectMapper mapper = new ObjectMapper();
