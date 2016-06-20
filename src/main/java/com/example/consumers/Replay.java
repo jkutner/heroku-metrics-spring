@@ -64,10 +64,10 @@ public class Replay {
     do {
       ConsumerRecords<String, String> records = consumer.poll(100);
       for (ConsumerRecord<String, String> record : records) {
-        if (null != System.getenv("REPLAY_HOST")) {
+        if (null == System.getenv("REPLAY_HOST")) {
           System.out.println("Simulating request: " + record.value());
         } else {
-
+          // TODO
         }
 
       }
