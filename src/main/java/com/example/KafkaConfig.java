@@ -1,4 +1,4 @@
-package com.example.kafka;
+package com.example;
 
 import com.github.jkutner.EnvKeyStore;
 import org.apache.kafka.clients.CommonClientConfigs;
