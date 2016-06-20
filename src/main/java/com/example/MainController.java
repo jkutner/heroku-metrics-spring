@@ -43,6 +43,14 @@ public class MainController implements BeanFactoryAware {
     RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
 
     Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(body.getBytes()));
+    for (String key : messages.keySet()) {
+      Object o = messages.get(key);
+      if (o != null)
+        System.out.println(key + ": <" + o.getClass() + "> " + o.toString());
+      else
+        System.out.println(key + ": null");
+    }
+
 
     ObjectMapper mapper = new ObjectMapper();
 
