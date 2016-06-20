@@ -40,7 +40,7 @@ public class MainController {
     Map<String, ?> messages = parser.parse(body, 1, true);
 
     for (String key : messages.keySet()) {
-      System.out.println(key);
+      System.out.println(key + ": " + messages.get(key));
     }
 
     return "ok";
