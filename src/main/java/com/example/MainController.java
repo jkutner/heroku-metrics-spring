@@ -41,10 +41,12 @@ public class MainController implements BeanFactoryAware {
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) throws IOException {
+    System.out.println("LOG: " + body);
+
     // "application/logplex-1" does not conform to RFC5424. It leaves out STRUCTURED-DATA but does not replace it with
     // a NILVALUE. To workaround this, we inject empty STRUCTURED-DATA.
     String[] parts = body.split("router - ");
-    String log = parts[0] + "router - [] " + parts[1];
+    String log = parts[0] + "router - [] " + (parts.length > 1 ? parts[1] : "");
 
     RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
     Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(log.getBytes()));
