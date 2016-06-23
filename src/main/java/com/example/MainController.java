@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,18 +38,19 @@ public class MainController implements BeanFactoryAware {
     return "Hello from Spring!";
   }
 
-
   @RequestMapping(value = "/logs", method = RequestMethod.POST)
   @ResponseBody
   public String logs(@RequestBody String body) throws IOException {
 
-    // "application/logplex-1" does not conform to RFC5424. It leaves out STRUCTURED-DATA but does not replace it with
+    // "application/logplex-1" does not conform to RFC5424.
+    // It leaves out STRUCTURED-DATA but does not replace it with
     // a NILVALUE. To workaround this, we inject empty STRUCTURED-DATA.
     String[] parts = body.split("router - ");
     String log = parts[0] + "router - [] " + (parts.length > 1 ? parts[1] : "");
 
     RFC6587SyslogDeserializer parser = new RFC6587SyslogDeserializer();
-    Map<String, ?> messages = parser.deserialize(new ByteArrayInputStream(log.getBytes()));
+    InputStream is = new ByteArrayInputStream(log.getBytes());
+    Map<String, ?> messages = parser.deserialize(is);
     ObjectMapper mapper = new ObjectMapper();
 
     MessageChannel toKafka = context.getBean("toKafka", MessageChannel.class);
