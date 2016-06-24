@@ -6,6 +6,9 @@ import redis.clients.jedis.JedisPool;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -28,27 +31,34 @@ public class Metrics extends AbstractLogConsumer {
 
   public void receive(Route route) {
     String path = route.get("path");
-    String pathDigest = "";
 
-    try (Jedis jedis = pool.getResource()) {
-      jedis.hset("routes", path, pathDigest);
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hash = digest.digest(path.getBytes(StandardCharsets.UTF_8));
+      String pathDigest = new String(hash);
 
-      for (String metric : Arrays.asList("service", "connect")) {
-        Integer value = Integer.valueOf(route.get(metric));
-        String key = pathDigest + "::" + metric;
+      try (Jedis jedis = pool.getResource()) {
+        System.out.println("Updating Redis: " + path);
+        jedis.hset("routes", path, pathDigest);
 
-        jedis.hincrBy(key, "sum", value);
-        jedis.hincrBy(key, "count", 1);
+        for (String metric : Arrays.asList("service", "connect")) {
+          Integer value = Integer.valueOf(route.get(metric));
+          String key = pathDigest + "::" + metric;
 
-        Integer sum = Integer.valueOf(jedis.hget(key, "sum"));
-        Float count = Float.valueOf(jedis.hget(key, "count"));
-        Float avg = sum / count;
-        jedis.hset(key, "average", String.valueOf(avg));
+          jedis.hincrBy(key, "sum", value);
+          jedis.hincrBy(key, "count", 1);
+
+          Integer sum = Integer.valueOf(jedis.hget(key, "sum"));
+          Float count = Float.valueOf(jedis.hget(key, "count"));
+          Float avg = sum / count;
+          jedis.hset(key, "average", String.valueOf(avg));
+        }
+
+        jedis.hincrBy(pathDigest + "::statuses", route.get("status"), 1);
       }
-
-      jedis.hincrBy(pathDigest + "::statuses", route.get("status"), 1);
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
     }
   }
-
 
 }
