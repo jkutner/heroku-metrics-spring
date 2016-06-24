@@ -75,7 +75,7 @@ public abstract class AbstractLogConsumer {
           Route route = new Route(recordMap);
           receive(route);
         } catch (IOException e) {
-          System.out.println("Error parsing recourd: " + record.value());
+          System.out.println("Error parsing record: " + record.value());
           e.printStackTrace();
         }
       }

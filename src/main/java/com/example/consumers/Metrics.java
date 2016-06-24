@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.Map;
 
 public class Metrics extends AbstractLogConsumer {
 
@@ -29,6 +28,7 @@ public class Metrics extends AbstractLogConsumer {
     pool = new JedisPool(redisUri);
   }
 
+  @Override
   public void receive(Route route) {
     String path = route.get("path");
 
@@ -38,7 +38,7 @@ public class Metrics extends AbstractLogConsumer {
       String pathDigest = new String(hash);
 
       try (Jedis jedis = pool.getResource()) {
-        System.out.println("Updating Redis: " + path);
+        System.out.println("Updating Redis: " + route.toString());
         jedis.hset("routes", path, pathDigest);
 
         for (String metric : Arrays.asList("service", "connect")) {
@@ -56,6 +56,7 @@ public class Metrics extends AbstractLogConsumer {
 
         jedis.hincrBy(pathDigest + "::statuses", route.get("status"), 1);
       }
+      System.out.println("Updated Redis!");
     } catch (NoSuchAlgorithmException e) {
       throw new RuntimeException(e);
     }

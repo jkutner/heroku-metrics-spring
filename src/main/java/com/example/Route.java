@@ -33,4 +33,12 @@ public class Route {
   public String timestamp() {
     return this.timestamp;
   }
+
+  public String toString() {
+    String out = "";
+    for (String key : message.keySet()) {
+      out = key + "=" + message.get(key) + " ";
+    }
+    return out;
+  }
 }
