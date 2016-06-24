@@ -62,7 +62,6 @@ public class Metrics extends AbstractLogConsumer {
 
         jedis.hincrBy(pathDigest + "::statuses", route.get("status"), 1);
       }
-      System.out.println("Updated Redis!");
     } catch (Exception e) {
       System.out.print("Error updating Redis!");
       e.printStackTrace();
