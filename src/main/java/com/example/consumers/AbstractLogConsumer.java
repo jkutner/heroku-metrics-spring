@@ -35,26 +35,20 @@ public abstract class AbstractLogConsumer {
 
   private ObjectMapper mapper = new ObjectMapper();
 
-  public static void main(String[] args) {
-    Replay replay = new Replay();
-
+  public void start() {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
-        replay.stop();
+        stopLoop();
       }
     });
 
-    replay.start();
-  }
-
-  public void start() {
     running.set(true);
     executor = Executors.newSingleThreadExecutor();
     executor.submit(this::loop);
     stopLatch = new CountDownLatch(1);
   }
 
-  public void stop() {
+  public void stopLoop() {
     running.set(false);
     try {
       stopLatch.await();

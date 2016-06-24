@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class Replay extends AbstractLogConsumer {
 
+  public static void main(String[] args) {
+    new Replay().start();
+  }
+
   @Override
   public void receive(Route route) {
     String path = route.get("path");

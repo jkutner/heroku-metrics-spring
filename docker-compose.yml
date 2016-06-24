@@ -1,5 +1,7 @@
 version: '2'
 services:
+  redis:
+    image: redis:3.0-alpine
   zookeeper:
     image: hone/kafka:2.11
     expose:
@@ -20,13 +22,14 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - redis
       - kafka
     env_file: .env
   shell:
     build: .
     volumes:
       - .:/app/
-      - ~/.m2/repository:/home/.m2/repository/
+      - ~/.m2/:/home/.m2/
     command: bash
     depends_on:
       - web
