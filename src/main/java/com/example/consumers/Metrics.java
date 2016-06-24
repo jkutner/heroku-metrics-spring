@@ -29,6 +29,12 @@ public class Metrics extends AbstractLogConsumer {
   }
 
   @Override
+  public void stopLoop() {
+    pool.destroy();
+    super.stopLoop();
+  }
+
+  @Override
   public void receive(Route route) {
     String path = route.get("path");
 
