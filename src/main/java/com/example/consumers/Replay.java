@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class Replay extends AbstractLogConsumer {
 
-  public void receive(Map<String,String> record) {
-    Route route = new Route(record);
+  @Override
+  public void receive(Route route) {
     String path = route.get("path");
 
     if (null == System.getenv("REPLAY_HOST")) {
