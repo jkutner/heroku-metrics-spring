@@ -48,7 +48,7 @@ public class Metrics extends AbstractLogConsumer {
         jedis.hset("routes", path, pathDigest);
 
         for (String metric : Arrays.asList("service", "connect")) {
-          Integer value = Integer.valueOf(route.get(metric));
+          Integer value = Integer.valueOf(route.get(metric).replace("ms", ""));
           String key = pathDigest + "::" + metric;
 
           jedis.hincrBy(key, "sum", value);
