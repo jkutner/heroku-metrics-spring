@@ -67,7 +67,7 @@ public abstract class AbstractLogConsumer {
     consumer = new KafkaConsumer<>(properties);
     consumer.subscribe(singletonList(KafkaConfig.getTopic()));
 
-    do {
+    while (running.get()) {
       ConsumerRecords<String, String> records = consumer.poll(100);
       for (ConsumerRecord<String, String> record : records) {
         try {
@@ -79,7 +79,7 @@ public abstract class AbstractLogConsumer {
           e.printStackTrace();
         }
       }
-    } while (running.get());
+    }
 
     System.out.println("closing consumer...");
     consumer.close();
