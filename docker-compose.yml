@@ -19,6 +19,7 @@ services:
     command: "java -jar target/heroku-replay-spring-1.0.jar"
     volumes:
       - .:/app/
+      - ~/.m2/:/home/.m2/
     ports:
       - "8080:8080"
     depends_on:
